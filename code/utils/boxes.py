@@ -42,11 +42,11 @@ are reluctant to change it even if our modern tastes prefer not to use it.
 
 import warnings
 import numpy as np
+from ..tasks.config import cfg
 
-from tasks.config import cfg
-# import utils.cython_bbox as cython_bbox
-# import utils.cython_nms as cython_nms
 
+# from ..utils import cython_bbox as cython_bbox
+# from ..utils import cython_nms as cython_nms
 # bbox_overlaps = cython_bbox.bbox_overlaps
 
 
@@ -59,7 +59,7 @@ def boxes_area(boxes):
     neg_area_idx = np.where(areas < 0)[0]
     if neg_area_idx.size:
         warnings.warn("Negative areas founds: %d" % neg_area_idx.size, RuntimeWarning)
-    #TODO proper warm up and learning rate may reduce the prob of assertion fail
+    # TODO proper warm up and learning rate may reduce the prob of assertion fail
     # assert np.all(areas >= 0), 'Negative areas founds'
     return areas, neg_area_idx
 
@@ -135,8 +135,8 @@ def clip_tiled_boxes(boxes, im_shape):
     has shape (N, 4 * num_tiled_boxes)."""
     assert boxes.shape[1] % 4 == 0, \
         'boxes.shape[1] is {:d}, but must be divisible by 4.'.format(
-        boxes.shape[1]
-    )
+            boxes.shape[1]
+        )
     # x1 >= 0
     boxes[:, 0::4] = np.maximum(np.minimum(boxes[:, 0::4], im_shape[1] - 1), 0)
     # y1 >= 0
@@ -300,10 +300,10 @@ def box_voting(top_dets, all_dets, thresh, scoring_method='ID', beta=1.0):
             P_avg = np.average(P, weights=ws)
             top_dets_out[k, 4] = P_avg
         elif scoring_method == 'GENERALIZED_AVG':
-            P_avg = np.mean(ws**beta)**(1.0 / beta)
+            P_avg = np.mean(ws ** beta) ** (1.0 / beta)
             top_dets_out[k, 4] = P_avg
         elif scoring_method == 'QUASI_SUM':
-            top_dets_out[k, 4] = ws.sum() / float(len(ws))**beta
+            top_dets_out[k, 4] = ws.sum() / float(len(ws)) ** beta
         else:
             raise NotImplementedError(
                 'Unknown scoring method {}'.format(scoring_method)
@@ -320,7 +320,7 @@ def nms(dets, thresh):
 
 
 def soft_nms(
-    dets, sigma=0.5, overlap_thresh=0.3, score_thresh=0.001, method='linear'
+        dets, sigma=0.5, overlap_thresh=0.3, score_thresh=0.001, method='linear'
 ):
     """Apply the soft NMS algorithm from https://arxiv.org/abs/1704.04503."""
     if dets.shape[0] == 0:

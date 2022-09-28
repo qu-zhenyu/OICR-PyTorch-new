@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-from pdb import set_trace as pause 
+from pdb import set_trace as pause
+
 
 def mil_loss(cls_score, labels):
     cls_score = cls_score.clamp(1e-6, 1 - 1e-6)

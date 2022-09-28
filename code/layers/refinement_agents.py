@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from ..tasks.config import cfg
 
-from tasks.config import cfg
 
 class RefinementAgents(nn.Module):
     def __init__(self, dim_in, dim_out):

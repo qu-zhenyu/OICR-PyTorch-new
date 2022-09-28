@@ -1,8 +1,9 @@
 import numpy as np
 import torch
-from   tasks.config import cfg
+from ..tasks.config import cfg
 from torchvision.ops import nms
 from pdb import set_trace as pause
+
 
 def box_results_for_corloc(scores, boxes):  # NOTE: support single-batch
     """Returns bounding-box detection results for CorLoc evaluation.
@@ -24,7 +25,7 @@ def box_results_for_corloc(scores, boxes):  # NOTE: support single-batch
     for j in range(1, num_classes):
         max_ind = np.argmax(scores[:, j])
         cls_boxes[j] = np.hstack((boxes[max_ind, :].reshape(1, -1),
-                               np.array([[scores[max_ind, j]]])))
+                                  np.array([[scores[max_ind, j]]])))
 
     im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
     boxes = im_results[:, :-1]
@@ -33,10 +34,9 @@ def box_results_for_corloc(scores, boxes):  # NOTE: support single-batch
 
 
 def box_results_with_nms_and_limit(scores, boxes):
-
     num_classes = cfg.MODEL.NUM_CLASSES + 1
     cls_boxes = [[] for _ in range(num_classes)]
-    
+
     for j in range(1, num_classes):
         inds = np.where(scores[:, j] > cfg.TEST.SCORE_THRESH)[0]
         scores_j = scores[inds, j]
@@ -58,14 +58,13 @@ def box_results_with_nms_and_limit(scores, boxes):
 
         if len(image_scores) > cfg.TEST.DETECTIONS_PER_IM:
             image_thresh = np.sort(image_scores)[-cfg.TEST.DETECTIONS_PER_IM]
-           
+
             for j in range(1, num_classes):
                 keep = np.where(cls_boxes[j][:, -1] >= image_thresh)[0]
                 cls_boxes[j] = cls_boxes[j][keep, :]
 
     im_results = np.vstack([cls_boxes[j] for j in range(1, num_classes)])
-    boxes      = im_results[:, :-1]
-    scores     = im_results[:, -1]
+    boxes = im_results[:, :-1]
+    scores = im_results[:, -1]
 
     return scores, boxes, cls_boxes
-

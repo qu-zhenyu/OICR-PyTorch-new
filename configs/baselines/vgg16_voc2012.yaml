@@ -10,7 +10,7 @@ TRAIN:
   SCALES: [480, 576, 688, 864, 1200]
 
 
-  # Number of umages between each optmizer update.
+  # Number of images between each optimizer update.
   ITERATION_SIZE: 4
 
   # Images *per GPU* in the training minibatch

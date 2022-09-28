@@ -21,10 +21,10 @@ from collections import defaultdict, OrderedDict
 import datetime
 import numpy as np
 
-from tasks.config import cfg
-from utils.logging import log_stats
-from utils.logging import SmoothedValue
-from utils.timer import Timer
+from ..tasks.config import cfg
+from ..utils.logging import log_stats
+from ..utils.logging import SmoothedValue
+from ..utils.timer import Timer
 
 
 class TrainingStats(object):
@@ -39,8 +39,10 @@ class TrainingStats(object):
         self.iter_timer = Timer()
         # Window size for smoothing tracked values (with median filtering)
         self.WIN_SZ = 20
+
         def create_smoothed_value():
             return SmoothedValue(self.WIN_SZ)
+
         self.smoothed_losses = defaultdict(create_smoothed_value)
         self.smoothed_total_loss = SmoothedValue(self.WIN_SZ)
         # For the support of args.iter_size
@@ -65,7 +67,6 @@ class TrainingStats(object):
 
         # Following code is saved for compatability of train_net.py and iter_size==1
         total_loss = 0
-
 
         for k, loss in model_out['losses'].items():
             assert loss.shape[0] == cfg.NUM_GPUS
@@ -140,7 +141,7 @@ class TrainingStats(object):
 
     def GetStats(self, cur_iter, lr):
         eta_seconds = self.iter_timer.average_time * (
-            cfg.SOLVER.MAX_ITER - cur_iter
+                cfg.SOLVER.MAX_ITER - cur_iter
         )
         eta = str(datetime.timedelta(seconds=int(eta_seconds)))
         stats = OrderedDict(

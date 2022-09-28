@@ -4,28 +4,21 @@
 
 import cv2
 import numpy as np
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from tasks.config import cfg
-
-from models.vgg16 import VGG16Backbone
-
+from ..tasks.config import cfg
+from ..models.vgg16 import VGG16Backbone
+from ..utils import vgg_weights_helper as vgg_utils
+from ..layers.refinement.oicr import OICR as Refinement
+from ..layers.losses.oicr_losses import OICRLosses as Losses
+from ..layers.losses.mil_loss import mil_loss
+from ..layers.refinement_agents import RefinementAgents
+from ..layers.mil import MIL
+from ..layers.roi_pooling.roi_pool import RoiPoolLayer
 import logging
 
 logger = logging.getLogger(__name__)
-
-import utils.vgg_weights_helper as vgg_utils
-
-from layers.refinement.oicr import OICR as Refinement
-from layers.losses.oicr_losses import OICRLosses   as Losses
-from layers.losses.mil_loss import mil_loss
-from layers.refinement_agents import RefinementAgents
-from layers.mil import MIL
-
-from layers.roi_pooling.roi_pool import RoiPoolLayer
 
 
 class DetectionModel(nn.Module):
@@ -98,7 +91,8 @@ class DetectionModel(nn.Module):
                     if i_refine == 0:
                         refinement_output = Refinement(boxes, mil_score, im_labels, lambda_gt=lambda_gt)
                     else:
-                        refinement_output = Refinement(boxes, refine_score[i_refine - 1], im_labels, lambda_gt=lambda_gt)
+                        refinement_output = Refinement(boxes, refine_score[i_refine - 1], im_labels,
+                                                       lambda_gt=lambda_gt)
 
                     refine_loss = self.Refine_Losses[i_refine](refine,
                                                                refinement_output['labels'],
@@ -107,7 +101,6 @@ class DetectionModel(nn.Module):
                                                                refinement_output['im_labels_real'])
 
                     return_dict['losses']['refine_loss%d' % i_refine] = refine_loss.clone()
-
 
                 # pytorch0.4 bug on gathering scalar(0-dim) tensors
                 for k, v in return_dict['losses'].items():
@@ -151,5 +144,3 @@ def loot_model(args):
     print("Using model description:", args.model)
     model = DetectionModel()
     return model
-
-

@@ -1,14 +1,11 @@
 import logging
 import os
 import numpy as np
-
 import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
-
-from tasks.config import cfg
+from ..tasks.config import cfg
 # import nn as mynn
-
 from pdb import set_trace as pause
 
 logger = logging.getLogger(__name__)
@@ -22,7 +19,7 @@ def clip_gradient(model, clip_norm):
             modulenorm = p.grad.data.norm()
             totalnorm += modulenorm ** 2
     totalnorm = torch.sqrt(totalnorm).item()
-    
+
     norm = (clip_norm / max(totalnorm, clip_norm))
     for p in model.parameters():
         if p.requires_grad and (p.grad is not None):
@@ -45,6 +42,7 @@ def decay_learning_rate(optimizer, cur_lr, decay_rate):
             if cfg.SOLVER.SCALE_MOMENTUM and cur_lr > 1e-7 and \
                     ratio > cfg.SOLVER.SCALE_MOMENTUM_THRESHOLD:
                 _CorrectMomentum(optimizer, param_group['params'], new_lr / cur_lr)
+
 
 def update_learning_rate(optimizer, cur_lr, new_lr):
     """Update learning rate"""
@@ -93,7 +91,6 @@ def _get_lr_change_ratio(cur_lr, new_lr):
 
 
 def affine_grid_gen(rois, input_size, grid_size):
-
     rois = rois.detach()
     x1 = rois[:, 1::4] / 16.0
     y1 = rois[:, 2::4] / 16.0
@@ -104,13 +101,13 @@ def affine_grid_gen(rois, input_size, grid_size):
     width = input_size[1]
 
     zero = Variable(rois.data.new(rois.size(0), 1).zero_())
-    theta = torch.cat([\
-      (x2 - x1) / (width - 1),
-      zero,
-      (x1 + x2 - width + 1) / (width - 1),
-      zero,
-      (y2 - y1) / (height - 1),
-      (y1 + y2 - height + 1) / (height - 1)], 1).view(-1, 2, 3)
+    theta = torch.cat([ \
+        (x2 - x1) / (width - 1),
+        zero,
+        (x1 + x2 - width + 1) / (width - 1),
+        zero,
+        (y2 - y1) / (height - 1),
+        (y1 + y2 - height + 1) / (height - 1)], 1).view(-1, 2, 3)
 
     grid = F.affine_grid(theta, torch.Size((rois.size(0), 1, grid_size, grid_size)))
 
@@ -125,7 +122,7 @@ def load_ckpt(model, ckpt):
     for name in ckpt:
         if mapping[name]:
             state_dict[name] = ckpt[name]
-            
+
     model.load_state_dict(state_dict, strict=False)
 
 

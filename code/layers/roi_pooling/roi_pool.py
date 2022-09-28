@@ -3,10 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Function
-
-
 import pdb
-from tasks.config import cfg
+from ...tasks.config import cfg
 import torchvision.ops as ops
 
 
@@ -22,9 +20,8 @@ class RoiPoolLayer(nn.Module):
         self.dim_out = hidden_dim = 4096
 
         roi_size = cfg.FAST_RCNN.ROI_XFORM_RESOLUTION
-        self.fc1 = nn.Linear(dim_in * roi_size**2, hidden_dim)
+        self.fc1 = nn.Linear(dim_in * roi_size ** 2, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
-
 
     def detectron_weight_mapping(self):
         detectron_weight_mapping = {
@@ -36,13 +33,12 @@ class RoiPoolLayer(nn.Module):
         return detectron_weight_mapping, []
 
     def forward(self, x, rois):
-        x = self.roi_pool(x, rois)	# [2333,512,7,7]
+        x = self.roi_pool(x, rois)  # [2333,512,7,7]
         # print('ROI_pooling', x.size())
         batch_size = x.size(0)
-        x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True) # [2333,4096]
+        x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)  # [2333,4096]
         # print('ROI_pooling_Relu1', x.size())
-        x = F.relu(self.fc2(x), inplace=True) # [2333,4096]
+        x = F.relu(self.fc2(x), inplace=True)  # [2333,4096]
         # print('ROI_pooling_Relu2', x.size())
 
         return x
-

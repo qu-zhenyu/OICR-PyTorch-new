@@ -3,22 +3,20 @@ from collections import defaultdict, Iterable
 from copy import deepcopy
 from datetime import datetime
 from itertools import chain
-
 import torch
-
-from tasks.config import cfg
+from ..tasks.config import cfg
 
 
 def get_run_name():
     """ A unique name for each run """
     return datetime.now().strftime(
-        '%Y-%m-%d_%H-%M-%S') #+ '_' + socket.gethostname()
+        '%Y-%m-%d_%H-%M-%S')  # + '_' + socket.gethostname()
 
 
 def get_output_dir(args):
     """ Get root output directory for each run """
     cfg_filename, _ = os.path.splitext(os.path.split(args.cfg_file)[1])
-    return os.path.join("snapshots", args.model, args.run_name.replace('_step',''))
+    return os.path.join("snapshots", args.model, args.run_name.replace('_step', ''))
 
 
 IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm']
@@ -68,8 +66,8 @@ def ensure_optimizer_ckpt_params_order(param_groups_names, checkpoint):
             saved_p_id = checkpoint['optimizer']['param_groups'][pos[0]]['params'][cnts[pos[0]]]
             assert (checkpoint['model'][key].shape ==
                     checkpoint['optimizer']['state'][saved_p_id]['momentum_buffer'].shape), \
-                   ('param and momentum_buffer shape mismatch in checkpoint.'
-                    ' param_name: {}, param_id: {}'.format(key, saved_p_id))
+                ('param and momentum_buffer shape mismatch in checkpoint.'
+                 ' param_name: {}, param_id: {}'.format(key, saved_p_id))
             param_groups_inds[pos[0]].append(pos[1])
             cnts[pos[0]] += 1
 
@@ -98,8 +96,8 @@ def load_optimizer_state_dict(optimizer, state_dict):
 
     # Update the state
     id_map = {old_id: p for old_id, p in
-                zip(chain(*(g['params'] for g in saved_groups)),
-                    chain(*(g['params'] for g in groups)))}
+              zip(chain(*(g['params'] for g in saved_groups)),
+                  chain(*(g['params'] for g in groups)))}
 
     def cast(param, value):
         """Make a deep copy of value, casting all tensors to device of param."""
@@ -134,6 +132,7 @@ def load_optimizer_state_dict(optimizer, state_dict):
     def update_group(group, new_group):
         new_group['params'] = group['params']
         return new_group
+
     param_groups = [
         update_group(g, ng) for g, ng in zip(groups, saved_groups)]
     optimizer.__setstate__({'state': state, 'param_groups': param_groups})

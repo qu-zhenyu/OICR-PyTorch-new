@@ -30,6 +30,7 @@ if __name__ == '__main__':
     """Testing"""
     from pprint import pprint
     import sys
+
     sys.path.insert(0, '..')
     from modeling.model_builder import Generalized_RCNN
     from core.config import cfg, cfg_from_file

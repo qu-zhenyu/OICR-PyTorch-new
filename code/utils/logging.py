@@ -21,8 +21,7 @@ import logging
 import numpy as np
 import smtplib
 import sys
-
-from tasks.config import cfg
+from ..tasks.config import cfg
 
 # Print lower precision floating point values than default FLOAT_REPR
 # Note! Has no use for json encode with C speedups

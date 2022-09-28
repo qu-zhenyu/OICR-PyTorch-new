@@ -3,11 +3,9 @@ Helper functions for converting resnet pretrained weights from other formats
 """
 import os
 import pickle
-
 import torch
-
-import utils.detectron_weight_helper as dwh
-from tasks.config import cfg
+from ..utils import detectron_weight_helper as dwh
+from ..tasks.config import cfg
 
 
 def load_pretrained_imagenet_weights(model):
@@ -26,7 +24,6 @@ def load_pretrained_imagenet_weights(model):
     else:
         weights_file = os.path.join(cfg.ROOT_DIR, cfg.VGG.IMAGENET_PRETRAINED_WEIGHTS)
         pretrianed_state_dict = convert_state_dict(torch.load(weights_file))
-
 
     model_state_dict = model.state_dict()
 

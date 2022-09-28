@@ -13,6 +13,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def parse_rec(filename):
     """ Parse a PASCAL VOC xml file """
     tree = ET.parse(filename)
@@ -32,12 +33,13 @@ def parse_rec(filename):
 
     return objects
 
+
 def corloc_eval(detpath,
-             annopath,
-             imagesetfile,
-             classname,
-             cachedir,
-             ovthresh=0.5):
+                annopath,
+                imagesetfile,
+                classname,
+                cachedir,
+                ovthresh=0.5):
     """rec, prec, ap = voc_eval(detpath,
                                 annopath,
                                 imagesetfile,
