@@ -8,7 +8,8 @@ import numbers
 import types
 import collections
 from pdb import set_trace as pause
-import utils.boxes as box_utils
+import torch.nn.functional as F
+from ..utils import boxes as box_utils
 from ..tasks.config import cfg
 
 __all__ = ["Compose", "ToTensor", "ToCVImage",
